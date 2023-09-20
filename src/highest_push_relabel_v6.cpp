@@ -22,7 +22,7 @@
 #include <chrono>
 
 
-highest_push_relabel_max_flow_v6::highest_push_relabel_max_flow_v6(GraphAdjListWitchReverse &G) 
+highest_push_relabel_max_flow_v6::highest_push_relabel_max_flow_v6(GraphAdjListWithReverse &G) 
   : Gf(G), list_height(Gf.num_vertices())
 {
   num_nodes = Gf.num_vertices();

@@ -2,11 +2,16 @@
 #include <chrono>
 
 #include "graph.h"
-#include "highest_push_relabel_v7.h"
+#include "highest_push_relabel_v8.h"
 #include "priority_queue.h"
 #include "list_node_height.h"
+#include "list.h"
 
-highest_push_relabel_max_flow_v7::highest_push_relabel_max_flow_v7(GraphAdjListWithReverse &G) 
+#include<chrono>
+
+
+
+hpr_hrd_gap_hlist_blist::hpr_hrd_gap_hlist_blist(GraphAdjListWithReverse &G) 
   : Gf(G), list_height(Gf.num_vertices())
 {
   num_nodes = Gf.num_vertices();
@@ -16,7 +21,7 @@ highest_push_relabel_max_flow_v7::highest_push_relabel_max_flow_v7(GraphAdjListW
 
 
 // Satura todos os arcos que saem da fonte no grafo Residual -> f(s,v) = u(s,v)
-void highest_push_relabel_max_flow_v7::initializePreflow()
+void hpr_hrd_gap_hlist_blist::initializePreflow()
 {
   for (LinkedListWithReverse::edge *e = Gf.get_edge(src); e != NULL; e = e->next) {
     if (e->capacity > 0) {
@@ -32,7 +37,7 @@ void highest_push_relabel_max_flow_v7::initializePreflow()
 
 // Empurra excesso contido no nó u para o nó v
 // Note: flow deve ser igual a min(node_excess[u], e->capacity);
-void highest_push_relabel_max_flow_v7::pushFlow(int u, LinkedListWithReverse::edge *e, int flow)
+void hpr_hrd_gap_hlist_blist::pushFlow(int u, LinkedListWithReverse::edge *e, int flow)
 {
   // Atualiza o fluxo e capacidade dos arcos (u,v) e (v,u) no grafo residual
   e->flow += flow;
@@ -43,7 +48,7 @@ void highest_push_relabel_max_flow_v7::pushFlow(int u, LinkedListWithReverse::ed
 
   // Insere o nó que recebeu excesso na fila se ele é diferente de s e t, e não possuia excesso antes da operação
   if (node_excess[e->destNode] == 0 and (e->destNode != src and e->destNode != sink)) {
-    bucket.push(e->destNode, node_height[e->destNode]);
+    bucket.pushElement(node_height[e->destNode], e->destNode);
   }
 
   // Atualiza o excesso de u e de v
@@ -57,7 +62,7 @@ void highest_push_relabel_max_flow_v7::pushFlow(int u, LinkedListWithReverse::ed
 // Se existir algum valor k < n tal que existam nós ativos i com rótulo de distância h(i) > k,
 // mas nenhum nó j com rótulo de distância h(j) = k (includo os não ativos),
 // então definimos h(i) = n para cada nó i com k < h(i) < n.
-void highest_push_relabel_max_flow_v7::gap(int k)
+void hpr_hrd_gap_hlist_blist::gap(int k)
 {
   if (k >= num_nodes) return;
 
@@ -73,7 +78,7 @@ void highest_push_relabel_max_flow_v7::gap(int k)
 }
 
 
-void highest_push_relabel_max_flow_v7::relabel(int u)
+void hpr_hrd_gap_hlist_blist::relabel(int u)
 {
   // backup da altura atual de u
   int h_u = node_height[u];
@@ -108,14 +113,14 @@ void highest_push_relabel_max_flow_v7::relabel(int u)
 }
 
 
-bool highest_push_relabel_max_flow_v7::isAdmissible(int u, LinkedListWithReverse::edge *e)
+bool hpr_hrd_gap_hlist_blist::isAdmissible(int u, LinkedListWithReverse::edge *e)
 {
   return (e->capacity > 0 and node_height[u] == node_height[e->destNode] + 1);
 }
 
 
 // Enquanto um nó u tiver excesso positivo realiza operações de push e de relabel
-void highest_push_relabel_max_flow_v7::discharge(int u)
+void hpr_hrd_gap_hlist_blist::discharge(int u)
 {
   LinkedListWithReverse::edge *e;
   list_height.remove_h(u);
@@ -137,22 +142,22 @@ void highest_push_relabel_max_flow_v7::discharge(int u)
 }
 
 
-int highest_push_relabel_max_flow_v7::solve(int s, int t)
+int hpr_hrd_gap_hlist_blist::solve(int s, int t)
 {
   auto start = std::chrono::steady_clock::now();
-
 
   src = s;
   sink = t;
   d = 0;
 
   list_height.initialize_all_height(0);
-  bucket.clear();
+  // bucket.clear();
 
   initializePreflow();
       
-  while (!bucket.is_empty()) {
-    int u = bucket.pop();
+  while (!bucket.empty())
+  {
+    int u = bucket.popFrontElement();
     discharge(u);
   }
 

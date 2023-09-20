@@ -12,6 +12,7 @@
 #include "highest_push_relabel_v5.h"
 #include "highest_push_relabel_v6.h"
 #include "highest_push_relabel_v7.h"
+#include "highest_push_relabel_v8.h"
 
 #include <string>
 #include <fstream>
@@ -64,8 +65,8 @@ int main(int argc, char **argv)
   t = stoi(label);
 
   GraphAdjacencyList G_simple(n);
-  ListGraph G_list(n);
-  VectorGraph G_vector(n);
+  GraphAdjListWithReverse G_list(n);
+  GraphAdjacencyVector G_vector(n);
 
   // Percorre o arquivo e insere cada arco no grafo
   while (getline(file, line)) { 
@@ -223,6 +224,19 @@ int main(int argc, char **argv)
 
   else if (algorithm == "HPRv7") {
     highest_push_relabel_max_flow_v7 max_flow(G_list);
+    fmax = max_flow.solve(s, t);
+
+    cout << "Arcos: " << G_list.num_edges() << endl;
+    cout << "Vertices: " << G_list.num_vertices() << endl; 
+    cout << "Fluxo: " << max_flow.get_max_flow() << endl;
+    cout << "Tempo(ns): " << max_flow.get_time_execution() << endl;
+    cout << "Pushs: " << max_flow.get_num_pushs() << endl;
+    cout << "Relabels: " << max_flow.get_num_relabels() << endl;
+    cout << "Gaps: " << max_flow.get_num_gaps() << endl;
+  }
+
+  else if (algorithm == "HPRv8") {
+    hpr_hrd_gap_hlist_blist max_flow(G_list);
     fmax = max_flow.solve(s, t);
 
     cout << "Arcos: " << G_list.num_edges() << endl;

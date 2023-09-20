@@ -3,40 +3,29 @@ from os.path import isfile, join
 import sys
 
 
-mainPath = "/home/ricardo/Downloads/Fluxo/implementacoes"
-instancesFolderPath = "/home/ricardo/Downloads/Fluxo/implementacoes/instancias"
+mainPath = "/home/ricardo/Downloads/Fluxo/MaximumFlowAlgorithms"
+instancesFolderPath = "/home/ricardo/Downloads/Fluxo/MaximumFlowAlgorithms/instances"
+testesFolderPath = "/home/ricardo/Downloads/Fluxo/MaximumFlowAlgorithms/testes"
 extensionFile = ".max"
-testeName = "HPRv6_2023_07_02"
+testeName = "HPRvblist_2023_16_07"
 
 instancesNames = [f for f in os.listdir(instancesFolderPath) if isfile(join(instancesFolderPath, f))]
 instancesNames = [instance for instance in instancesNames if extensionFile in instance]
-
-def levalor(texto, arquivo):
-  pin = arquivo.find(texto)
-  if pin == -1:
-    return ""
-  pfin = arquivo.find('\n',pin)
-  tamanho = len(texto)
-  return  arquivo[pin+tamanho:pfin]
+instancesNames.sort()
 
 method = testeName.split('_')[0]
-nomeArquivoDados = testeName + "/" + method + ".csv"
+nomeArquivoDados = testesFolderPath + "/" + testeName + "/" + method + ".csv"
 arquivoDados = open(nomeArquivoDados, "w")
 
-print("Nome da instancia,vertices,arcos,fluxo,tempo(ns),Pushs,Relabels,Gaps")
-arquivoDados.write("Nome da instancia,Vertices,Arcos,Fluxo,Tempo(ns),Pushs,Relabels,Gaps\n")
+print("Nome da instancia,Arcos,Vertices,Fluxo,Tempo(ns),Pushs,Relabels")
+arquivoDados.write("Nome da instancia,Arcos,Vertices,Fluxo,Tempo(ns),Pushs,Relabels\n")
 
 for i in instancesNames:
-  nomeArquivoDeSolucao = testeName + "/" + i + ".log"
+  nomeArquivoDeSolucao = testesFolderPath + "/" + testeName + "/" + i + ".log"
   arquivoDeSolucao = open(nomeArquivoDeSolucao, "r")
-  solucao = arquivoDeSolucao.read()
-  vertices = levalor("Vertices: ", solucao)
-  arcos = levalor("Arcos: ", solucao)
-  fluxo = levalor("Fluxo: ", solucao)
-  tempo = levalor("Tempo(ns): ", solucao)
-  push = levalor("Pushs: ", solucao)
-  relabel = levalor("Relabels: ", solucao)
-  gap = levalor("Gaps: ", solucao)
-  print(i + "," + vertices + "," + arcos + "," + fluxo + "," + tempo + "," + push + "," + relabel)
-  arquivoDados.write(i + "," + vertices + "," + arcos + "," + fluxo + "," + tempo +  "," + push + "," + relabel + "," + gap + "\n")
+  solucao = arquivoDeSolucao.readlines()
+  instance_name = i.split(".")[0]
+  data = [instance_name] + [line.strip().split(": ")[1] for line in solucao if ":" in line]
+  print(",".join(data))
+  arquivoDados.write(",".join(data) + "\n")
 arquivoDados.close()

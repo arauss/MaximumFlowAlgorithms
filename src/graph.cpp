@@ -45,45 +45,31 @@ GraphAdjacencyList::GraphAdjacencyList(GraphAdjacencyList &G_original) {
   }
 }
 
+
 // Constroi um grafo residual delta a partir de um grafo residual
 // utilizando apenas os arcos de capacidade residual maior que delta 
 GraphAdjacencyList::GraphAdjacencyList(GraphAdjacencyList &G_residual, int delta) {
   this->n = G_residual.num_vertices();
   this->G = new LinkedList::edge*[this->n + 1];
 
-  if (delta > 1) {
-    // Insere os arcos no grafo residual delta
-    for (int u = 0; u <= this->n; u++) {
-      this->G[u] = NULL;
-      LinkedList::edge *e = G_residual.get_edge(u);
+  // Insere os arcos no grafo residual delta
+  for (int u = 0; u <= this->n; u++) {
+    this->G[u] = NULL;
+    LinkedList::edge *e;
 
-      while (e != NULL) {
-        if (e->capacity >= delta) {
-          add_edge(u, e->destNode, e->capacity); // direct edge
+    for (e = G_residual.get_edge(u); e != nullptr; e = e->next) {
+      if (e->capacity >= delta) {
+        this->add_edge(u, e->destNode, e->capacity); // direct edge
 
-          LinkedList::edge *e_reverse = G_residual.get_edge(e->destNode, u);
-          if (e_reverse->capacity < delta) {
-            add_edge(e->destNode, u, 0);           // reverse edge
-          }
+        LinkedList::edge *e_reverse = G_residual.get_edge(e->destNode, u);
+        if (e_reverse->capacity < delta) {
+          this->add_edge(e->destNode, u, 0);           // reverse edge
         }
-                    
-        e = e->next;
-      }
-    }
-
-  } else { // Gf(delta) = Gf
-
-    for (int u = 0; u <= this->n; u++) {
-      this->G[u] = NULL;
-      LinkedList::edge *e = G_residual.get_edge(u);
-
-      while (e != NULL) {
-        add_edge(u, e->destNode, e->capacity); // direct edge         
-        e = e->next;
-      }
+      }     
     }
   }
 }
+
 
 
 // Adiciona um arco com origem u, destino v, e capacidade capacity
@@ -216,39 +202,60 @@ GraphAdjacencyList::~GraphAdjacencyList() {
 
 
 // Inicializa um grafo sem arcos
-GraphAdjListWitchReverse::GraphAdjListWitchReverse(int numV) {
+GraphAdjListWithReverse::GraphAdjListWithReverse(int numV) {
   n = numV;         
-  G = new LinkedListWithReverse::edge*[n + 1]; 
+  G = new LinkedListWithReverse::edge*[n + 1];
+
+  numEdges = new int[n+1];
 
   for (int u = 0; u <= n; u++) {
     G[u] = nullptr;
+    numEdges[u] = 0;
   }
 }
 
 // Constroi um Grafo residual a partir de um grafo original
-GraphAdjListWitchReverse::GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_original) {
+GraphAdjListWithReverse::GraphAdjListWithReverse(GraphAdjListWithReverse &G_original) {
+
   this->n = G_original.num_vertices();
   this->G = new LinkedListWithReverse::edge*[this->n + 1];
 
+  this->numEdges = new int[this->n+1];
+
   for (int u = 0; u <= this->n; u++) {
     this->G[u] = nullptr;
+    this->numEdges[u] = 0;
   }
+  
 
   // Paraca arco (i,j) do grafo original verifica se ele já existe no reisidual
   //  - Se existir, atualiza a capacidade desse arco no grafo residual
   //  - Se não, cria os arcos (i,j) e (j,i)-[com cap 0] no grafo residual
-  for (int u = 0; u <= this->n; u++) {
+
+  // ver tempo acumulado das buscas
+  // verificar se não tem erro
+  // multigrafo
+  // estrutura auxiliar pra não fazer buscas atoa
+  // rodar testes do blist (com todas as melhorias) sem sort e atualizar a tabela
+  for (int u = 1; u <= this->n; u++) {
     LinkedListWithReverse::edge *e = G_original.get_edge(u);
 
     while (e != nullptr) {
-      LinkedListWithReverse::edge *e_residual = this->get_edge(u, e->destNode);
+      int v = e->destNode;
+      LinkedListWithReverse::edge *e_residual;
+
+      if(numEdges[u] <= numEdges[v]) {
+        e_residual = this->get_edge(u, v);
+      } else {
+        e_residual = this->get_edge(v, u);
+        if (e_residual != nullptr)
+          e_residual = e_residual->reverse;
+      }
 
       if (e_residual != nullptr) {
         e_residual->capacity = e->capacity;
-      }
-      
-      else {
-        this->add_edge_with_reverse(u, e->destNode, e->capacity);    // direct edge
+      } else {
+        this->add_edge_with_reverse(u, v, e->capacity);
       }
 
       e = e->next;
@@ -257,32 +264,6 @@ GraphAdjListWitchReverse::GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_o
 }
 
 
-// // Constroi um Grafo residual a partir de um grafo original
-// GraphAdjListWitchReverse::GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_original) {
-//   this->n = G_original.num_vertices();
-//   this->G = new LinkedListWithReverse::edge*[this->n + 1];
-
-//   for (int u = 0; u <= this->n; u++) {
-//     this->G[u] = nullptr;
-//   }
-
-
-//   // Insere os arcos diretos presentes no grafo original
-//   // e os arcos reversos de capacidade zero caso não exista no grafo original
-//   for (int u = 0; u <= this->n; u++) {
-//     LinkedListWithReverse::edge *e = G_original.get_edge(u);
-
-//     while (e != nullptr) {
-//       add_edge(u, e->destNode, e->capacity);    // direct edge
-
-//       if (G_original.get_edge(e->destNode, u) == nullptr) {
-//         add_edge(e->destNode, u, 0);            // reverse edge
-//       }
-      
-//       e = e->next;
-//     }
-//   }
-// }
 
 
 
@@ -290,7 +271,7 @@ GraphAdjListWitchReverse::GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_o
 // residual Gf = (V, Af), em que AfΔ é o conjunto de todos os arcos (i,j)
 // pertencentes a Af cuja capacidade residual seja maior ou igual a um
 // parâmetro delta 
-GraphAdjListWitchReverse::GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_residual, int delta) {
+GraphAdjListWithReverse::GraphAdjListWithReverse(GraphAdjListWithReverse &G_residual, int delta) {
   this->n = G_residual.num_vertices();
   this->G = new LinkedListWithReverse::edge*[this->n + 1];
 
@@ -317,7 +298,7 @@ GraphAdjListWitchReverse::GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_r
 
 
 // Adiciona um arco com origem u, destino v, e capacidade capacity
-void GraphAdjListWitchReverse::add_edge(int u, int v, int capacity) {
+void GraphAdjListWithReverse::add_edge(int u, int v, int capacity) {
   LinkedListWithReverse::edge *newEdge = new LinkedListWithReverse::edge;
   newEdge->destNode = v;
   newEdge->capacity = capacity;
@@ -330,7 +311,7 @@ void GraphAdjListWitchReverse::add_edge(int u, int v, int capacity) {
 
 // Adiciona um arco com origem u, destino v, e capacidade capacity
 // e seu reverso como origem v, destino u, e capacidade 0
-void GraphAdjListWitchReverse::add_edge_with_reverse(int u, int v, int capacity) {
+void GraphAdjListWithReverse::add_edge_with_reverse(int u, int v, int capacity) {
   // alocate and add the (u,v) arc in adjascency list of u
   LinkedListWithReverse::edge *newEdge = new LinkedListWithReverse::edge;
   newEdge->destNode = v;
@@ -350,12 +331,15 @@ void GraphAdjListWitchReverse::add_edge_with_reverse(int u, int v, int capacity)
   // adjust the pointers
   newEdge->reverse = reverseEdge;
   reverseEdge->reverse = newEdge;
+
+  numEdges[u] = numEdges[u] +1;
+  numEdges[v] = numEdges[v] +1;
   
   m += 2;
 }
 
 // Acrescenta flow unidades no fluxo atual do arco (u,v)
-void GraphAdjListWitchReverse::add_flow(int u, int v, int flow) {
+void GraphAdjListWithReverse::add_flow(int u, int v, int flow) {
   LinkedListWithReverse::edge *e = get_edge(u, v);
 
   if (e != nullptr and e->flow + flow <= e->capacity) {
@@ -364,7 +348,7 @@ void GraphAdjListWitchReverse::add_flow(int u, int v, int flow) {
 }
 
 // Acrescenta capacityEdit unidades na capacidade atual do arco (u,v)
-void GraphAdjListWitchReverse::add_capacity(int u, int v, int capacityEdit) {
+void GraphAdjListWithReverse::add_capacity(int u, int v, int capacityEdit) {
   LinkedListWithReverse::edge *e = get_edge(u, v);
   
   if (e != nullptr) {
@@ -374,7 +358,7 @@ void GraphAdjListWitchReverse::add_capacity(int u, int v, int capacityEdit) {
 
 
 // Percorre o grafo definindo todo fluxo como zero
-void GraphAdjListWitchReverse::zera_flow() {
+void GraphAdjListWithReverse::zera_flow() {
 
   for (int u = 0; u <= n; u++) {
     LinkedListWithReverse::edge *e = get_edge(u);
@@ -387,10 +371,10 @@ void GraphAdjListWitchReverse::zera_flow() {
 }
 
 // Retorna um apontador para o primeiro arco saindo de u
-LinkedListWithReverse::edge * GraphAdjListWitchReverse::get_edge(int u) { return G[u]; }
+LinkedListWithReverse::edge * GraphAdjListWithReverse::get_edge(int u) { return G[u]; }
 
 // Retorna um apontador para o arco (u,v), caso exista, ou para nullptr
-LinkedListWithReverse::edge * GraphAdjListWitchReverse::get_edge(int u, int v) {
+LinkedListWithReverse::edge * GraphAdjListWithReverse::get_edge(int u, int v) {
   LinkedListWithReverse::edge *e = G[u];
 
   while (e != nullptr) {
@@ -404,7 +388,7 @@ LinkedListWithReverse::edge * GraphAdjListWitchReverse::get_edge(int u, int v) {
 
 
 // Retorna o valor da capacidade do arco (u,v)
-int GraphAdjListWitchReverse::get_capacity(int u, int v) {
+int GraphAdjListWithReverse::get_capacity(int u, int v) {
   LinkedListWithReverse::edge *e = get_edge(u, v);
   
   if (e != nullptr) {
@@ -415,13 +399,13 @@ int GraphAdjListWitchReverse::get_capacity(int u, int v) {
 }
 
 // Retorna o número de vértices contido no grafo
-int GraphAdjListWitchReverse::num_vertices() { return this->n; }
+int GraphAdjListWithReverse::num_vertices() { return this->n; }
 
 // Retorna o número de Arcos contido no grafo
-int GraphAdjListWitchReverse::num_edges() { return this->m; }
+int GraphAdjListWithReverse::num_edges() { return this->m; }
 
 
-void GraphAdjListWitchReverse::print_grafo() {
+void GraphAdjListWithReverse::print_grafo() {
   for (int u = 0; u <= n; u++) {
     LinkedListWithReverse::edge *e = G[u];
 
@@ -432,7 +416,7 @@ void GraphAdjListWitchReverse::print_grafo() {
   }
 }
 
-GraphAdjListWitchReverse::~GraphAdjListWitchReverse() {
+GraphAdjListWithReverse::~GraphAdjListWithReverse() {
   if (G != nullptr) {
     for (int u = 0; u <= n; u++) {
       LinkedListWithReverse::edge *e_temp = G[u];
@@ -468,9 +452,6 @@ GraphAdjListWitchReverse::~GraphAdjListWitchReverse() {
 
 
 
-
-
-// Constroi um grafo a partir de um arquivo de texto no formato
 GraphAdjacencyVector::GraphAdjacencyVector(int numV) {
   n = numV;
   G = std::vector<std::vector<vectorList::edge>> (n + 1);

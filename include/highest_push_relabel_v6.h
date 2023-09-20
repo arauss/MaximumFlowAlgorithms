@@ -23,7 +23,7 @@
 
 
 class highest_push_relabel_max_flow_v6 {
-  GraphAdjListWitchReverse Gf;
+  GraphAdjListWithReverse Gf;
   int src, sink;
   int num_nodes;
 
@@ -48,7 +48,7 @@ class highest_push_relabel_max_flow_v6 {
 
 public:
   // ctor
-  highest_push_relabel_max_flow_v6(GraphAdjListWitchReverse &G);
+  highest_push_relabel_max_flow_v6(GraphAdjListWithReverse &G);
 
   int solve(int s, int t);
 

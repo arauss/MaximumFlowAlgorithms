@@ -3,8 +3,8 @@ from os.path import isfile, join
 
 # Editar nome do teste, data de execução e diretório das instancias
 
-# ["BAP", "CS", "SAP", "HPRv1", "HPRv2", "HPRv3", "HPRv4", "HPRv5", "HPRv6", "HPRv7", "PR"]
-method = ["BAP", "CS", "SAP", "HPRv1", "HPRv2", "HPRv3", "HPRv4", "HPRv5", "HPRv6", "HPRv7", "PR"]
+# ["BAP", "CS", "SAP", "HPRv1", "HPRv2", "HPRv3", "HPRv4", "HPRv5", "HPRv6", "HPRv7", "HPRv8", "PR"]
+method = ["BAP", "CS", "SAP", "HPRv1", "HPRv2", "HPRv3", "HPRv4", "HPRv5", "HPRv6", "HPRv7", "HPRv8", "PR"]
 date = "2023_16_07"
 
 mainPath = "/home/ricardo/Downloads/Fluxo/MaximumFlowAlgorithms"

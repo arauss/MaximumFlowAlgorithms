@@ -28,7 +28,7 @@ long int time_discharge = 0;
 long int time_bucket = 0;
 
 
-highest_push_relabel_max_flow_v5::highest_push_relabel_max_flow_v5(GraphAdjListWitchReverse &G) 
+highest_push_relabel_max_flow_v5::highest_push_relabel_max_flow_v5(GraphAdjListWithReverse &G) 
   : Gf(G)
 {
   num_nodes = Gf.num_vertices();

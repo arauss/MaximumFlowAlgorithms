@@ -97,15 +97,16 @@ namespace LinkedListWithReverse {
   };
 }
 
-class GraphAdjListWitchReverse {
+class GraphAdjListWithReverse {
   int m = 0, n = 0;
-  LinkedListWithReverse::edge **G; 
+  LinkedListWithReverse::edge **G;
+  int *numEdges;
 
 public:
-  GraphAdjListWitchReverse(int numV);
-  GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_original);
-  GraphAdjListWitchReverse(GraphAdjListWitchReverse &G_original, int delta);
-  ~GraphAdjListWitchReverse();
+  GraphAdjListWithReverse(int numV);
+  GraphAdjListWithReverse(GraphAdjListWithReverse &G_original);
+  GraphAdjListWithReverse(GraphAdjListWithReverse &G_original, int delta);
+  ~GraphAdjListWithReverse();
 
   void add_edge(int u, int v, int capacity);
   void add_edge_with_reverse(int u, int v, int capacity);

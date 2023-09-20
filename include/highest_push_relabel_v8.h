@@ -12,16 +12,17 @@
 // e realiza um relabel em nós acima desse gap para evitar realizar operações em nós
 // que poderiam criar um ciclho de pushs e relabels entre si, até chegar na altura n
 
-#ifndef HIGHEST_PUSH_RELABEL_V7
-#define HIGHEST_PUSH_RELABEL_V7
+#ifndef HIGHEST_PUSH_RELABEL_V8
+#define HIGHEST_PUSH_RELABEL_V8
 
 #include "graph.h"
 #include "priority_queue.h"
 #include "list_node_height.h"
+#include "list.h"
 
 #include <vector>
 
-class highest_push_relabel_max_flow_v7 {
+class hpr_hrd_gap_hlist_blist {
   GraphAdjListWithReverse Gf;
   int src, sink;
   int num_nodes;
@@ -36,7 +37,9 @@ class highest_push_relabel_max_flow_v7 {
   std::vector<int> node_excess;
   std::vector<int> node_height;
   list_node_height list_height;
-  PriorityQueueWithRestrictedPush bucket;
+  // PriorityQueueWithRestrictedPush bucket;
+  ListHeight bucket;
+
 
   void initializePreflow();
   void pushFlow(int u, LinkedListWithReverse::edge *e, int flow);
@@ -47,7 +50,7 @@ class highest_push_relabel_max_flow_v7 {
 
 public:
   // ctor
-  highest_push_relabel_max_flow_v7(GraphAdjListWithReverse &G);
+  hpr_hrd_gap_hlist_blist(GraphAdjListWithReverse &G);
 
   int solve(int s, int t);
 
